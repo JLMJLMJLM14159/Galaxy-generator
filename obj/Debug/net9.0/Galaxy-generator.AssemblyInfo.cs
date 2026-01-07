@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Galaxy-generator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3ea8dbb8daf94c4843614ef8cf055ed23f03f978")]
 [assembly: System.Reflection.AssemblyProductAttribute("Galaxy-generator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Galaxy-generator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
