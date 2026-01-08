@@ -1,25 +1,46 @@
-﻿namespace Galaxy_Generator
+﻿using System.Drawing;
+
+namespace Galaxy_Generator
 {
     public static class Program
     {
         public static void Main()
         {
             
+            Galaxy.GalaxySizes? galaxySize;
+            Console.Write("Enter galaxy size:");
+            string? galaxySizeString = Console.ReadLine();
+            if (galaxySizeString != null)
+            {
+                try
+                { galaxySize = Enum.Parse<Galaxy.GalaxySizes>(galaxySizeString); }
+                catch
+                { galaxySize = null; }
+            }
+            else { galaxySize = null; }
+
+            Galaxy.GalaxyTypes? galaxyType;
+            Console.Write("Enter galaxy type:");
+            string? galaxyTypeString = Console.ReadLine();
+            if (galaxyTypeString != null)
+            {
+                try
+                { galaxyType = Enum.Parse<Galaxy.GalaxyTypes>(galaxyTypeString); }
+                catch
+                { galaxyType = null; }
+            }
+            else { galaxyType = null; }
+
+            Galaxy galaxy = new(galaxySize, galaxyType);
         }
     }
 
     public class Galaxy
     {
-        public Dictionary<(double, double, double), System> Systems { get; set; }
-        public GalaxyTypes GalaxyType { get; set; }
+        public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; }
         public GalaxySizes GalaxySize { get; set; }
-        public enum GalaxyTypes
-        {
-            spiral,
-            elliptical,
-            lenticular,
-            irregular
-        }
+        public GalaxyTypes GalaxyType { get; set; }
+        public (double, double, double) SizeCoords { get; set; }
         public enum GalaxySizes
         {
             tiny,
@@ -28,20 +49,28 @@
             large,
             massive,
         }
-        public Galaxy(GalaxyTypes? galaxyType, GalaxySizes? galaxySize)
+        public enum GalaxyTypes
+        {
+            spiral,
+            elliptical,
+        }
+        public Galaxy(GalaxySizes? galaxySize, GalaxyTypes? galaxyType)
         {
             Random random = new();
-            GalaxyType = galaxyType != null ? galaxyType.Value : Enum.GetValues<GalaxyTypes>()[random.Next(Enum.GetValues<GalaxyTypes>().Length)];
             GalaxySize = galaxySize != null ? galaxySize.Value : Enum.GetValues<GalaxySizes>()[random.Next(Enum.GetValues<GalaxySizes>().Length)];
+            GalaxyType = galaxyType != null ? galaxyType.Value : Enum.GetValues<GalaxyTypes>()[random.Next(Enum.GetValues<GalaxyTypes>().Length)];
+
+            Bitmap bitmap = new($"{AppContext.BaseDirectory}/Probability textures/{GalaxyType}.png");
+            
         }
     }
 
-    public class System
+    public class StarSystem
     {
-        public Dictionary<(double, double, double), Planet> Planets { get; set; }
+        public Dictionary<(double, double, double), Body> Bodies { get; set; }
     }
 
-    public class Planet
+    public class Body
     {
         
     }

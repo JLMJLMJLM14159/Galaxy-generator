@@ -6,6 +6,12 @@
     <RootNamespace>Galaxy_generator</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseSystemDrawing>true</UseSystemDrawing>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="10.0.1" />
+  </ItemGroup>
 
 </Project>
