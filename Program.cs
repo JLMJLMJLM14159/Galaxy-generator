@@ -40,7 +40,7 @@ namespace Galaxy_Generator
         public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; }
         public GalaxySizes GalaxySize { get; set; }
         public GalaxyTypes GalaxyType { get; set; }
-        public (int, int, int) SizeCoords { get; set; }
+        public (int, int, int) GalaxySizeCoords { get; set; }
         public int NumberOfStarSystems { get; set; }
         public enum GalaxySizes
         {
@@ -60,18 +60,62 @@ namespace Galaxy_Generator
             Random random = new();
             GalaxySize = galaxySize != null ? galaxySize.Value : Enum.GetValues<GalaxySizes>()[random.Next(Enum.GetValues<GalaxySizes>().Length)];
             GalaxyType = galaxyType != null ? galaxyType.Value : Enum.GetValues<GalaxyTypes>()[random.Next(Enum.GetValues<GalaxyTypes>().Length)];
+            StarSystems = [];
+            StarSystems.Add((0, 0, 0), new(true));
 
-            SizeCoords = (100000 * (int)GalaxySize, 190 * (int)GalaxySize, 100000 * (int)GalaxySize);
+            GalaxySizeCoords = (100000 * (int)GalaxySize, 190 * (int)GalaxySize, 100000 * (int)GalaxySize);
             NumberOfStarSystems = 20000000 * (int)GalaxySize;
 
             Bitmap bitmap = new($"{AppContext.BaseDirectory}/Probability textures/{GalaxyType}.png");
-            
+
+            int numberOfStarSystemsToMake = NumberOfStarSystems;
+            while (numberOfStarSystemsToMake > 0)
+            {
+                float x = random.Next((GalaxySizeCoords.Item1 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+                float y = random.Next((GalaxySizeCoords.Item2 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+                float z = random.Next((GalaxySizeCoords.Item3 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+
+                float threshold = SampleProbability(bitmap, x, z, GalaxySizeCoords.Item1, GalaxySizeCoords.Item3);
+
+                if ((float)random.NextDouble() < threshold) //GOING DOWN ON PURPORSE, FIGURE IT OUT DUMBASS
+                {
+                    StarSystems.Add((x, y, z), new(false));
+                    numberOfStarSystemsToMake--;
+                }
+            }
+        }
+
+        public static float SampleProbability(Bitmap bitmap, float x, float z, float galaxySizeX, float galaxySizeZ)
+        {
+            float u = x / galaxySizeX;
+            float w = z / galaxySizeZ;
+
+            int imgX = (int)(u * (bitmap.Width - 1));
+            int imgZ = (int)(w * (bitmap.Height - 1));
+
+            imgX = Math.Clamp(imgX, 0, bitmap.Width - 1);
+            imgZ = Math.Clamp(imgZ, 0, bitmap.Height - 1);
+
+            Color c = bitmap.GetPixel(imgX, imgZ);
+            return (c.R + c.G + c.B) / 3 / 255f;
         }
     }
 
     public class StarSystem
     {
-        public Dictionary<(double, double, double), Body> Bodies { get; set; }
+        public Dictionary<(double, double, double), Body>? Bodies { get; set; }
+
+        public StarSystem(bool blackHole)
+        {
+            if (blackHole)
+            {
+                
+            }
+            else
+            {
+                
+            }
+        }
     }
 
     public class Body
