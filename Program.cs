@@ -40,14 +40,15 @@ namespace Galaxy_Generator
         public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; }
         public GalaxySizes GalaxySize { get; set; }
         public GalaxyTypes GalaxyType { get; set; }
-        public (double, double, double) SizeCoords { get; set; }
+        public (int, int, int) SizeCoords { get; set; }
+        public int NumberOfStarSystems { get; set; }
         public enum GalaxySizes
         {
-            tiny,
-            small,
-            normal,
-            large,
-            massive,
+            tiny = 10,
+            small = 25,
+            normal = 50,
+            large = 75,
+            massive = 100,
         }
         public enum GalaxyTypes
         {
@@ -59,6 +60,9 @@ namespace Galaxy_Generator
             Random random = new();
             GalaxySize = galaxySize != null ? galaxySize.Value : Enum.GetValues<GalaxySizes>()[random.Next(Enum.GetValues<GalaxySizes>().Length)];
             GalaxyType = galaxyType != null ? galaxyType.Value : Enum.GetValues<GalaxyTypes>()[random.Next(Enum.GetValues<GalaxyTypes>().Length)];
+
+            SizeCoords = (100000 * (int)GalaxySize, 190 * (int)GalaxySize, 100000 * (int)GalaxySize);
+            NumberOfStarSystems = 20000000 * (int)GalaxySize;
 
             Bitmap bitmap = new($"{AppContext.BaseDirectory}/Probability textures/{GalaxyType}.png");
             
