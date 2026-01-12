@@ -34,6 +34,7 @@ namespace Galaxy_Generator
 
             Galaxy galaxy = new(galaxySize, galaxyType);
             string json = JsonSerializer.Serialize(galaxy);
+            Console.WriteLine(json);
             File.WriteAllText("galaxy.json", json);
         }
     }
@@ -47,6 +48,7 @@ namespace Galaxy_Generator
         public int NumberOfStarSystems { get; set; }
         public enum GalaxySizes
         {
+            rlysmall = 1,
             tiny = 10,
             small = 25,
             normal = 50,
@@ -87,7 +89,7 @@ namespace Galaxy_Generator
                     numberOfStarSystemsToMake--;
 
                     times++;
-                    Console.WriteLine($"({x}, {y}, {z}), {times}/{NumberOfStarSystems}");
+                    Console.WriteLine($"({x}, {y}, {z}), {times}/{NumberOfStarSystems}, {(decimal)times / NumberOfStarSystems * 100}%");
                 }
             }
         }
