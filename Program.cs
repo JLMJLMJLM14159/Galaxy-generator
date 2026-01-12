@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Text.Json;
 
 namespace Galaxy_Generator
 {
@@ -8,7 +9,7 @@ namespace Galaxy_Generator
         {
             
             Galaxy.GalaxySizes? galaxySize;
-            Console.Write("Enter galaxy size:");
+            Console.Write("Enter galaxy size: ");
             string? galaxySizeString = Console.ReadLine();
             if (galaxySizeString != null)
             {
@@ -20,7 +21,7 @@ namespace Galaxy_Generator
             else { galaxySize = null; }
 
             Galaxy.GalaxyTypes? galaxyType;
-            Console.Write("Enter galaxy type:");
+            Console.Write("Enter galaxy type: ");
             string? galaxyTypeString = Console.ReadLine();
             if (galaxyTypeString != null)
             {
@@ -32,6 +33,8 @@ namespace Galaxy_Generator
             else { galaxyType = null; }
 
             Galaxy galaxy = new(galaxySize, galaxyType);
+            string json = JsonSerializer.Serialize(galaxy);
+            File.WriteAllText("galaxy.json", json);
         }
     }
 
@@ -69,6 +72,7 @@ namespace Galaxy_Generator
             Bitmap bitmap = new($"{AppContext.BaseDirectory}/Probability textures/{GalaxyType}.png");
 
             int numberOfStarSystemsToMake = NumberOfStarSystems;
+            int times = 0;
             while (numberOfStarSystemsToMake > 0)
             {
                 float x = random.Next((GalaxySizeCoords.Item1 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
@@ -77,10 +81,13 @@ namespace Galaxy_Generator
 
                 float threshold = SampleProbability(bitmap, x, z, GalaxySizeCoords.Item1, GalaxySizeCoords.Item3);
 
-                if ((float)random.NextDouble() < threshold) //GOING DOWN ON PURPORSE, FIGURE IT OUT DUMBASS
+                if ((float)random.NextDouble() < threshold && !StarSystems.ContainsKey((x, y, z))) //GOING DOWN ON PURPORSE, FIGURE IT OUT DUMBASS
                 {
                     StarSystems.Add((x, y, z), new(false));
                     numberOfStarSystemsToMake--;
+
+                    times++;
+                    Console.WriteLine($"({x}, {y}, {z}), {times}/{NumberOfStarSystems}");
                 }
             }
         }
