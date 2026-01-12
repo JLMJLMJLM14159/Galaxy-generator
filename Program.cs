@@ -41,7 +41,7 @@ namespace Galaxy_Generator
 
     public class Galaxy
     {
-        public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; }
+        public Dictionary<(int, int, int), StarSystem> StarSystems { get; set; } //COORDS MEASURED IN PETAMETRES, NOT LY
         public GalaxySizes GalaxySize { get; set; }
         public GalaxyTypes GalaxyType { get; set; }
         public (int, int, int) GalaxySizeCoords { get; set; }
@@ -77,9 +77,9 @@ namespace Galaxy_Generator
             int times = 0;
             while (numberOfStarSystemsToMake > 0)
             {
-                float x = random.Next((GalaxySizeCoords.Item1 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
-                float y = random.Next((GalaxySizeCoords.Item2 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
-                float z = random.Next((GalaxySizeCoords.Item3 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+                int x = random.Next((GalaxySizeCoords.Item1 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+                int y = random.Next((GalaxySizeCoords.Item2 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+                int z = random.Next((GalaxySizeCoords.Item3 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
 
                 float threshold = SampleProbability(bitmap, x, z, GalaxySizeCoords.Item1, GalaxySizeCoords.Item3);
 
@@ -112,7 +112,7 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public Dictionary<(double, double, double), Body>? Bodies { get; set; }
+        public Dictionary<int, Body>? Bodies { get; set; } //THE NO TUPLE IS FOR MEASURING RADIUS WOAH
 
         public StarSystem(bool blackHole)
         {
