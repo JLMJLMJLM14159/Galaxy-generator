@@ -108,7 +108,7 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public Dictionary<int, StellarBody<Planet>>? StarsAndBelow { get; set; } //THE NO TUPLE IS FOR MEASURING RADIUS WOAH
+        public Dictionary<int, StellarBody<Planet>>? StarsAndBelow { get; set; } //THE NO TUPLE IS FOR MEASURING RADIUS OF ORBIT WOAH
 
         public StarSystem(bool blackHole)
         {
