@@ -1,5 +1,5 @@
-﻿using System.Drawing;
-using System.Text.Json;
+﻿using Newtonsoft.Json;
+using System.Drawing;
 
 namespace Galaxy_Generator
 {
@@ -33,22 +33,20 @@ namespace Galaxy_Generator
             else { galaxyType = null; }
 
             Galaxy galaxy = new(galaxySize, galaxyType);
-            string json = JsonSerializer.Serialize(galaxy);
-            Console.WriteLine(json);
-            File.WriteAllText("galaxy.json", json);
+
+            GalaxyFileManagement.Save(galaxy);
         }
     }
 
     public class Galaxy
     {
-        public Dictionary<(int, int, int), StarSystem> StarSystems { get; set; } //COORDS MEASURED IN PETAMETRES, NOT LY
+        public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; } //COORDS MEASURED IN PETAMETRES, NOT LY
         public GalaxySizes GalaxySize { get; set; }
         public GalaxyTypes GalaxyType { get; set; }
-        public (int, int, int) GalaxySizeCoords { get; set; }
+        public (double, double, double) GalaxySizeCoords { get; set; }
         public int NumberOfStarSystems { get; set; }
         public enum GalaxySizes
         {
-            rlysmall = 1,
             tiny = 10,
             small = 25,
             normal = 50,
@@ -68,18 +66,17 @@ namespace Galaxy_Generator
             StarSystems = [];
             StarSystems.Add((0, 0, 0), new(true));
 
-            GalaxySizeCoords = (100000 * (int)GalaxySize, 190 * (int)GalaxySize, 100000 * (int)GalaxySize);
-            NumberOfStarSystems = 20000000 * (int)GalaxySize;
+            GalaxySizeCoords = (10 * (int)GalaxySize, 0.019 * (int)GalaxySize, 10 * (int)GalaxySize);
+            NumberOfStarSystems = 2000 * (int)GalaxySize;
 
             Bitmap bitmap = new($"{AppContext.BaseDirectory}/Probability textures/{GalaxyType}.png");
 
             int numberOfStarSystemsToMake = NumberOfStarSystems;
-            int times = 0;
             while (numberOfStarSystemsToMake > 0)
             {
-                int x = random.Next((GalaxySizeCoords.Item1 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
-                int y = random.Next((GalaxySizeCoords.Item2 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
-                int z = random.Next((GalaxySizeCoords.Item3 / 2) + 1) * new List<int>([-1, 1])[random.Next(2)];
+                double x = random.NextDouble() * (GalaxySizeCoords.Item1 / 2) + 1 * new List<int>([-1, 1])[random.Next(2)];
+                double y = random.NextDouble() * (GalaxySizeCoords.Item2 / 2) + 1 * new List<int>([-1, 1])[random.Next(2)];
+                double z = random.NextDouble() * (GalaxySizeCoords.Item3 / 2) + 1 * new List<int>([-1, 1])[random.Next(2)];
 
                 float threshold = SampleProbability(bitmap, x, z, GalaxySizeCoords.Item1, GalaxySizeCoords.Item3);
 
@@ -88,16 +85,15 @@ namespace Galaxy_Generator
                     StarSystems.Add((x, y, z), new(false));
                     numberOfStarSystemsToMake--;
 
-                    times++;
-                    Console.WriteLine($"({x}, {y}, {z}), {times}/{NumberOfStarSystems}, {(decimal)times / NumberOfStarSystems * 100}%");
+                    Console.WriteLine($"({x}, {y}, {z}), {NumberOfStarSystems - numberOfStarSystemsToMake}/{NumberOfStarSystems}, {(decimal)(NumberOfStarSystems - numberOfStarSystemsToMake) / NumberOfStarSystems * 100}%");
                 }
             }
         }
 
-        public static float SampleProbability(Bitmap bitmap, float x, float z, float galaxySizeX, float galaxySizeZ)
+        public static float SampleProbability(Bitmap bitmap, double x, double z, double galaxySizeX, double galaxySizeZ)
         {
-            float u = x / galaxySizeX;
-            float w = z / galaxySizeZ;
+            double u = x / galaxySizeX;
+            double w = z / galaxySizeZ;
 
             int imgX = (int)(u * (bitmap.Width - 1));
             int imgZ = (int)(w * (bitmap.Height - 1));
@@ -112,7 +108,7 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public Dictionary<int, Body>? Bodies { get; set; } //THE NO TUPLE IS FOR MEASURING RADIUS WOAH
+        public Dictionary<int, StellarBody<Planet>>? StarsAndBelow { get; set; } //THE NO TUPLE IS FOR MEASURING RADIUS WOAH
 
         public StarSystem(bool blackHole)
         {
@@ -127,8 +123,61 @@ namespace Galaxy_Generator
         }
     }
 
-    public class Body
+    public abstract class StellarBody<TChild>
+    {
+        public List<TChild> Children = [];
+    }
+
+    public class BlackHole : StellarBody<Planet>
     {
         
+    }
+
+    public class Star : StellarBody<Planet>
+    {
+        
+    }
+
+    public class Planet : StellarBody<Moon>
+    {
+        
+    }
+
+    public class Moon : StellarBody<NoChild>
+    {
+        
+    }
+
+    public sealed class NoChild : StellarBody<NoChild>
+    {
+        private NoChild() { }
+    }
+
+
+    public static class GalaxyFileManagement
+    {
+        public static void Save<T>(T obj)
+        {
+            string file = JsonConvert.SerializeObject(
+                obj,
+                Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                }
+            );
+            File.WriteAllText("galaxy.json", file);
+        }
+
+        public static Galaxy? Load(string json)
+        {
+            return JsonConvert.DeserializeObject<Galaxy>(
+                json,
+                new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                }
+            );
+        }
     }
 }
