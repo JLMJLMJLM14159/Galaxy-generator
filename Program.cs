@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Drawing;
+using System.Globalization;
 using static Galaxy_Generator.SizesClass;
 using static Galaxy_Generator.SizesClass.Sizes;
 
@@ -102,44 +103,62 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public Dictionary<int, StellarBody<Planet>>? StarsAndBelow { get; set; } = []; //THE NO TUPLE IS FOR MEASURING RADIUS OF ORBIT WOAH
+        public List<StellarBody<Planet>>? StarsAndBelow { get; set; } = []; //THE NO TUPLE IS FOR MEASURING RADIUS OF ORBIT WOAH
 
         public StarSystem(bool blackHole)
         {
             if (blackHole)
-            {
-                StarsAndBelow.Add(0, new BlackHole(massive, "Central black hole"));
-            }
+            { StarsAndBelow.Add(new BlackHole(massive)); }
             else
             {
-                
+                Random random = new();
+
+                List<int> numberOfPotentialStars = [ 1, 2, 3, 4 ];
+                List<double> numberOfPotentialStarsWeights = [ 0.7, 0.2, 0.075, 0.025 ];
+
+                int chosenIndex = 0;
+                double randomDouble = random.NextDouble();
+                double cumulative = 0;
+                for (int i = 0; i < numberOfPotentialStars.Count; i++)
+                {
+                    cumulative += numberOfPotentialStarsWeights[i];
+                    if (randomDouble <= cumulative)
+                    {
+                        chosenIndex = i;
+                        break;
+                    }
+                }
+
+                for (int i = 1; i <= numberOfPotentialStars[chosenIndex]; i++)
+                {
+                    StarsAndBelow.Add(random.NextDouble() <= 0.95 ? new Star(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)]) : new BlackHole(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)]));
+                }
             }
         }
     }
 
-    public abstract class StellarBody<TChild>(Sizes size = normal, string name = "")
+    public abstract class StellarBody<TChild>(Sizes size = normal)
     {
         public List<TChild> Children { get; set; } = [];
         public Sizes Size { get; set; } = size;
-        public string Name { get; set; } = name;
     }
 
-    public class BlackHole(Sizes size, string name) : StellarBody<Planet>(size, name)
+    public class BlackHole(Sizes size) : StellarBody<Planet>(size)
     {
         
     }
 
-    public class Star(Sizes size, string name) : StellarBody<Planet>(size, name)
+    public class Star(Sizes size) : StellarBody<Planet>(size)
     {
         
     }
 
-    public class Planet(Sizes size, string name) : StellarBody<Moon>(size, name)
+    public class Planet(Sizes size) : StellarBody<Moon>(size)
     {
         
     }
 
-    public class Moon(Sizes size, string name) : StellarBody<NoChild>(size, name)
+    public class Moon(Sizes size) : StellarBody<NoChild>(size)
     {
         
     }
