@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Drawing;
+using static Galaxy_Generator.SizesClass;
+using static Galaxy_Generator.SizesClass.Sizes;
 
 namespace Galaxy_Generator
 {
@@ -8,13 +10,13 @@ namespace Galaxy_Generator
         public static void Main()
         {
             
-            Galaxy.GalaxySizes? galaxySize;
+            Sizes? galaxySize;
             Console.Write("Enter galaxy size: ");
             string? galaxySizeString = Console.ReadLine();
             if (galaxySizeString != null)
             {
                 try
-                { galaxySize = Enum.Parse<Galaxy.GalaxySizes>(galaxySizeString); }
+                { galaxySize = Enum.Parse<Sizes>(galaxySizeString); }
                 catch
                 { galaxySize = null; }
             }
@@ -41,27 +43,19 @@ namespace Galaxy_Generator
     public class Galaxy
     {
         public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; } //COORDS MEASURED IN PETAMETRES, NOT LY
-        public GalaxySizes GalaxySize { get; set; }
+        public Sizes GalaxySize { get; set; }
         public GalaxyTypes GalaxyType { get; set; }
         public (double, double, double) GalaxySizeCoords { get; set; }
         public int NumberOfStarSystems { get; set; }
-        public enum GalaxySizes
-        {
-            tiny = 10,
-            small = 25,
-            normal = 50,
-            large = 75,
-            massive = 100,
-        }
         public enum GalaxyTypes
         {
             spiral,
             elliptical,
         }
-        public Galaxy(GalaxySizes? galaxySize, GalaxyTypes? galaxyType)
+        public Galaxy(Sizes? galaxySize, GalaxyTypes? galaxyType)
         {
             Random random = new();
-            GalaxySize = galaxySize != null ? galaxySize.Value : Enum.GetValues<GalaxySizes>()[random.Next(Enum.GetValues<GalaxySizes>().Length)];
+            GalaxySize = galaxySize != null ? galaxySize.Value : Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)];
             GalaxyType = galaxyType != null ? galaxyType.Value : Enum.GetValues<GalaxyTypes>()[random.Next(Enum.GetValues<GalaxyTypes>().Length)];
             StarSystems = [];
             StarSystems.Add((0, 0, 0), new(true));
@@ -108,13 +102,13 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public Dictionary<int, StellarBody<Planet>>? StarsAndBelow { get; set; } //THE NO TUPLE IS FOR MEASURING RADIUS OF ORBIT WOAH
+        public Dictionary<int, StellarBody<Planet>>? StarsAndBelow { get; set; } = []; //THE NO TUPLE IS FOR MEASURING RADIUS OF ORBIT WOAH
 
         public StarSystem(bool blackHole)
         {
             if (blackHole)
             {
-                
+                StarsAndBelow.Add(0, new BlackHole(massive, "Central black hole"));
             }
             else
             {
@@ -123,27 +117,29 @@ namespace Galaxy_Generator
         }
     }
 
-    public abstract class StellarBody<TChild>
+    public abstract class StellarBody<TChild>(Sizes size = normal, string name = "")
     {
-        public List<TChild> Children = [];
+        public List<TChild> Children { get; set; } = [];
+        public Sizes Size { get; set; } = size;
+        public string Name { get; set; } = name;
     }
 
-    public class BlackHole : StellarBody<Planet>
-    {
-        
-    }
-
-    public class Star : StellarBody<Planet>
+    public class BlackHole(Sizes size, string name) : StellarBody<Planet>(size, name)
     {
         
     }
 
-    public class Planet : StellarBody<Moon>
+    public class Star(Sizes size, string name) : StellarBody<Planet>(size, name)
     {
         
     }
 
-    public class Moon : StellarBody<NoChild>
+    public class Planet(Sizes size, string name) : StellarBody<Moon>(size, name)
+    {
+        
+    }
+
+    public class Moon(Sizes size, string name) : StellarBody<NoChild>(size, name)
     {
         
     }
@@ -178,6 +174,18 @@ namespace Galaxy_Generator
                     TypeNameHandling = TypeNameHandling.Auto
                 }
             );
+        }
+    }
+
+    public static class SizesClass
+    {
+        public enum Sizes
+        {
+            tiny = 10,
+            small = 25,
+            normal = 50,
+            large = 75,
+            massive = 100,
         }
     }
 }
