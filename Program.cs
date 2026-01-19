@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System.Drawing;
-using System.Globalization;
 using static Galaxy_Generator.SizesClass;
 using static Galaxy_Generator.SizesClass.Sizes;
+using static Galaxy_Generator.CentralBody;
+using static Galaxy_Generator.CentralBody.CentralBodies;
 
 namespace Galaxy_Generator
 {
@@ -103,12 +104,12 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public List<StellarBody<Planet>>? StarsAndBelow { get; set; } = []; //THE NO TUPLE IS FOR MEASURING RADIUS OF ORBIT WOAH
+        public List<CentralBody>? CentralBodies { get; set; } = [];
 
         public StarSystem(bool blackHole)
         {
             if (blackHole)
-            { StarsAndBelow.Add(new BlackHole(massive)); }
+            { CentralBodies.Add(new CentralBody(massive, blackhole)); }
             else
             {
                 Random random = new();
@@ -130,44 +131,66 @@ namespace Galaxy_Generator
                 }
 
                 for (int i = 1; i <= numberOfPotentialStars[chosenIndex]; i++)
+                { CentralBodies.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)], random.NextDouble() <= 0.95 ? star : blackhole)); }
+
+                foreach (CentralBody centralBody in CentralBodies)
                 {
-                    StarsAndBelow.Add(random.NextDouble() <= 0.95 ? new Star(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)]) : new BlackHole(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)]));
+                    List<int> numberOfPotentialPlanets = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+                    List<double> numberOfPotentialPlanetsWeights = [ 0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.05, 0.05, 0.05, 0.05 ];
+
+                    chosenIndex = 0;
+                    randomDouble = random.NextDouble();
+                    cumulative = 0;
+                    for (int i = 0; i < numberOfPotentialPlanets.Count; i++)
+                    {
+                        cumulative += numberOfPotentialPlanetsWeights[i];
+                        if (randomDouble <= cumulative)
+                        {
+                            chosenIndex = i;
+                            break;
+                        }
+                    }
+
+                    for (int i = 1; i <= numberOfPotentialPlanets[chosenIndex]; i++)
+                    { centralBody.Planets.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)])); }
+                    
+                    foreach (Planet planet in centralBody.Planets)
+                    {
+                        int numberOfMoons = random.Next(16);
+                        for (int i = 1; i <= numberOfMoons; i++)
+                        { planet.Moons.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)])); }
+                    }
                 }
             }
         }
     }
 
-    public abstract class StellarBody<TChild>(Sizes size = normal)
+    public abstract class StellarBody(Sizes size = normal)
     {
-        public List<TChild> Children { get; set; } = [];
         public Sizes Size { get; set; } = size;
     }
 
-    public class BlackHole(Sizes size) : StellarBody<Planet>(size)
+    public class CentralBody(Sizes size, CentralBodies bodyType)
+    {
+        public List<Planet> Planets { get; set; } = [];
+        public Sizes Size { get; set; } = size;
+        public enum CentralBodies
+        {
+            star,
+            blackhole
+        }
+        public CentralBodies BodyType = bodyType;
+    }
+
+    public class Planet(Sizes size) : StellarBody(size)
+    {
+        public List<Moon> Moons { get; set; } = [];
+    }
+
+    public class Moon(Sizes size) : StellarBody(size)
     {
         
     }
-
-    public class Star(Sizes size) : StellarBody<Planet>(size)
-    {
-        
-    }
-
-    public class Planet(Sizes size) : StellarBody<Moon>(size)
-    {
-        
-    }
-
-    public class Moon(Sizes size) : StellarBody<NoChild>(size)
-    {
-        
-    }
-
-    public sealed class NoChild : StellarBody<NoChild>
-    {
-        private NoChild() { }
-    }
-
 
     public static class GalaxyFileManagement
     {
