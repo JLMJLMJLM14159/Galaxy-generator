@@ -109,7 +109,7 @@ namespace Galaxy_Generator
         public StarSystem(bool blackHole)
         {
             if (blackHole)
-            { CentralBodies.Add(new CentralBody(massive, blackhole)); }
+            { CentralBodies.Add(new CentralBody(huge, blackhole)); }
             else
             {
                 Random random = new();
@@ -156,7 +156,7 @@ namespace Galaxy_Generator
                     
                     foreach (Planet planet in centralBody.Planets)
                     {
-                        int numberOfMoons = random.Next(16);
+                        int numberOfMoons = random.Next(26);
                         for (int i = 1; i <= numberOfMoons; i++)
                         { planet.Moons.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)])); }
                     }
@@ -227,7 +227,7 @@ namespace Galaxy_Generator
             small = 25,
             normal = 50,
             large = 75,
-            massive = 100,
+            huge = 100,
         }
     }
 }
