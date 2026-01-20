@@ -11,7 +11,8 @@ namespace Galaxy_Generator
     {
         public static void Main()
         {
-            
+            Directory.CreateDirectory("results");
+
             Sizes? galaxySize;
             Console.Write("Enter galaxy size: ");
             string? galaxySizeString = Console.ReadLine();
@@ -37,17 +38,19 @@ namespace Galaxy_Generator
             else { galaxyType = null; }
 
             Galaxy galaxy = new(galaxySize, galaxyType);
-
+            Console.WriteLine("Successfully created galaxy. Mapping...");
+            galaxy.MapAndSaveGalaxy();
+            Console.WriteLine("Successfully mapped galaxy. Saving to file...");
             GalaxyFileManagement.Save(galaxy);
         }
     }
 
     public class Galaxy
     {
-        public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; } //COORDS MEASURED IN PETAMETRES, NOT LY
+        public Dictionary<(double, double, double), StarSystem> StarSystems { get; set; }
         public Sizes GalaxySize { get; set; }
         public GalaxyTypes GalaxyType { get; set; }
-        public (double, double, double) GalaxySizeCoords { get; set; }
+        public (int, double, int) GalaxySizeCoords { get; set; }
         public int NumberOfStarSystems { get; set; }
         public enum GalaxyTypes
         {
@@ -70,9 +73,9 @@ namespace Galaxy_Generator
             int numberOfStarSystemsToMake = NumberOfStarSystems;
             while (numberOfStarSystemsToMake > 0)
             {
-                double x = random.NextDouble() * (GalaxySizeCoords.Item1 / 2) + 1 * new List<int>([-1, 1])[random.Next(2)];
-                double y = random.NextDouble() * (GalaxySizeCoords.Item2 / 2) + 1 * new List<int>([-1, 1])[random.Next(2)];
-                double z = random.NextDouble() * (GalaxySizeCoords.Item3 / 2) + 1 * new List<int>([-1, 1])[random.Next(2)];
+                double x = random.NextDouble() * GalaxySizeCoords.Item1;
+                double y = random.NextDouble() * GalaxySizeCoords.Item2;
+                double z = random.NextDouble() * GalaxySizeCoords.Item3;
 
                 float threshold = SampleProbability(bitmap, x, z, GalaxySizeCoords.Item1, GalaxySizeCoords.Item3);
 
@@ -99,6 +102,48 @@ namespace Galaxy_Generator
 
             Color c = bitmap.GetPixel(imgX, imgZ);
             return (c.R + c.G + c.B) / 3 / 255f;
+        }
+
+        public void MapAndSaveGalaxy()
+        {
+            Bitmap bmp = new(GalaxySizeCoords.Item1 + 1, GalaxySizeCoords.Item3 + 1);
+            Graphics g = Graphics.FromImage(bmp);
+
+            double minX = StarSystems.Keys.Min(k => k.Item1);
+            double maxX = StarSystems.Keys.Max(k => k.Item1);
+            double minZ = StarSystems.Keys.Min(k => k.Item3);
+            double maxZ = StarSystems.Keys.Max(k => k.Item3);
+
+            Console.WriteLine($"X range: {minX} to {maxX}");
+            Console.WriteLine($"Z range: {minZ} to {maxZ}");
+
+            double avgX = StarSystems.Keys.Average(k => k.Item1);
+            double avgZ = StarSystems.Keys.Average(k => k.Item3);
+
+            Console.WriteLine($"Average X: {avgX}");
+            Console.WriteLine($"Average Z: {avgZ}");
+
+            Console.WriteLine($"GalaxySizeCoords: X={GalaxySizeCoords.Item1}, Y={GalaxySizeCoords.Item2}, Z={GalaxySizeCoords.Item3}");
+
+            g.Clear(Color.Black);
+
+            foreach (KeyValuePair<(double, double, double), StarSystem> Kvp in StarSystems)
+            {
+                int x = (int)Kvp.Key.Item1;
+                int z = (int)Kvp.Key.Item3;
+
+                try
+                {
+                    bmp.SetPixel(x, z, Color.White);
+                }
+                catch
+                {
+                    Console.WriteLine($"Naughty pixel is (x: {x}, z: {z})");
+                    Environment.Exit(1);
+                }
+            }
+
+            bmp.Save("results/galaxy.png");
         }
     }
 
@@ -204,7 +249,7 @@ namespace Galaxy_Generator
                     TypeNameHandling = TypeNameHandling.Auto
                 }
             );
-            File.WriteAllText("galaxy.json", file);
+            File.WriteAllText("results/galaxy.json", file);
         }
 
         public static Galaxy? Load(string json)
