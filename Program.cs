@@ -54,7 +54,6 @@ namespace Galaxy_Generator
         public int NumberOfStarSystems { get; set; }
         public enum GalaxyTypes
         {
-            spiral,
             elliptical,
         }
         public Galaxy(Sizes? galaxySize, GalaxyTypes? galaxyType)
