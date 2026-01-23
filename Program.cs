@@ -9,10 +9,32 @@ namespace Galaxy_Generator
 {
     public static class Program
     {
+        public static readonly Dictionary<string, Action> AdditionalModes = new()
+        {
+            { "normal", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); } },
+            { "normalandviewsystems", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); ViewSystem(galaxy, AskForSystemToView()); } },
+            { "loadandviewsystems", () => { Galaxy galaxy = Load()!; ViewSystem(galaxy, AskForSystemToView()); } }
+        };
+
         public static void Main()
         {
             Directory.CreateDirectory("results");
 
+            Console.Write("Change mode? Leave blank for normal excecution. Enter here: ");
+            string? modeString = Console.ReadLine();
+            if (modeString != null)
+            {
+                if (AdditionalModes.TryGetValue(modeString, out Action? value))
+                {
+                    value();
+                }
+                else { AdditionalModes["normal"](); }
+            }
+            else { AdditionalModes["normal"](); }
+        }
+
+        private static Galaxy Create()
+        {
             Sizes? galaxySize;
             Console.Write("Enter galaxy size: ");
             string? galaxySizeString = Console.ReadLine();
@@ -37,11 +59,46 @@ namespace Galaxy_Generator
             }
             else { galaxyType = null; }
 
-            Galaxy galaxy = new(galaxySize, galaxyType);
-            Console.WriteLine("Successfully created galaxy. Mapping...");
-            galaxy.MapAndSaveGalaxy();
-            Console.WriteLine("Successfully mapped galaxy. Saving to file...");
-            GalaxyFileManagement.Save(galaxy);
+            return new(galaxySize, galaxyType);
+        }
+
+        private static Galaxy? Load() => GalaxyFileManagement.Load("results/galaxy.json");
+
+        private static void Save(Galaxy galaxy) => GalaxyFileManagement.Save(galaxy);
+
+        private static void MapAndSaveMap(Galaxy galaxy) => galaxy.MapAndSaveGalaxyMap();
+
+        private static (double, double, double) AskForSystemToView()
+        {
+            Console.Write("Enter x coord for system: ");
+            double x = double.Parse(Console.ReadLine()!);
+            Console.Write("\nEnter y coord for system: ");
+            double y = double.Parse(Console.ReadLine()!);
+            Console.Write("\nEnter z coord for system: ");
+            double z = double.Parse(Console.ReadLine()!);
+
+            return (x, y, z);
+        }
+
+        private static void ViewSystem(Galaxy galaxy, (double, double, double) coords)
+        {
+            if (galaxy.StarSystems.TryGetValue(coords, out StarSystem? value))
+            {
+                Console.WriteLine($"System at coordinates ({coords.Item1}, {coords.Item2}, {coords.Item3}):");
+                Console.WriteLine($"    Central bodies:");
+                foreach (CentralBody centralBody in value.CentralBodies)
+                {
+                    Console.WriteLine($"        A {centralBody.BodyType}, {centralBody.Size}, with planets:");
+                    foreach (Planet planet in centralBody.Planets)
+                    {
+                        Console.WriteLine($"            A planet, {planet.Size}, with moons:");
+                        foreach (Moon moon in planet.Moons)
+                        {
+                            Console.WriteLine($"                A moon, {moon.Size}.");
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -103,24 +160,16 @@ namespace Galaxy_Generator
             return (c.R + c.G + c.B) / 3 / 255f;
         }
 
-        public void MapAndSaveGalaxy()
+        public void MapAndSaveGalaxyMap()
         {
             Bitmap bmp = new(GalaxySizeCoords.Item1 + 1, GalaxySizeCoords.Item3 + 1);
             Graphics g = Graphics.FromImage(bmp);
 
-            double minX = StarSystems.Keys.Min(k => k.Item1);
-            double maxX = StarSystems.Keys.Max(k => k.Item1);
-            double minZ = StarSystems.Keys.Min(k => k.Item3);
-            double maxZ = StarSystems.Keys.Max(k => k.Item3);
+            Console.WriteLine($"X range: {StarSystems.Keys.Min(k => k.Item1)} to {StarSystems.Keys.Max(k => k.Item1)}");
+            Console.WriteLine($"Z range: {StarSystems.Keys.Min(k => k.Item3)} to {StarSystems.Keys.Max(k => k.Item3)}");
 
-            Console.WriteLine($"X range: {minX} to {maxX}");
-            Console.WriteLine($"Z range: {minZ} to {maxZ}");
-
-            double avgX = StarSystems.Keys.Average(k => k.Item1);
-            double avgZ = StarSystems.Keys.Average(k => k.Item3);
-
-            Console.WriteLine($"Average X: {avgX}");
-            Console.WriteLine($"Average Z: {avgZ}");
+            Console.WriteLine($"Average X: {StarSystems.Keys.Average(k => k.Item1)}");
+            Console.WriteLine($"Average Z: {StarSystems.Keys.Average(k => k.Item3)}");
 
             Console.WriteLine($"GalaxySizeCoords: X={GalaxySizeCoords.Item1}, Y={GalaxySizeCoords.Item2}, Z={GalaxySizeCoords.Item3}");
 
@@ -148,7 +197,7 @@ namespace Galaxy_Generator
 
     public class StarSystem
     {
-        public List<CentralBody>? CentralBodies { get; set; } = [];
+        public List<CentralBody> CentralBodies { get; set; } = [];
 
         public StarSystem(bool blackHole)
         {
