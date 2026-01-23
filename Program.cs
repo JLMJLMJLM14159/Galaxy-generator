@@ -62,7 +62,7 @@ namespace Galaxy_Generator
             return new(galaxySize, galaxyType);
         }
 
-        private static Galaxy? Load() => GalaxyFileManagement.Load("results/galaxy.json");
+        private static Galaxy? Load() => GalaxyFileManagement.Load(File.ReadAllText("results/galaxy.json"));
 
         private static void Save(Galaxy galaxy) => GalaxyFileManagement.Save(galaxy);
 
@@ -180,15 +180,7 @@ namespace Galaxy_Generator
                 int x = (int)Kvp.Key.Item1;
                 int z = (int)Kvp.Key.Item3;
 
-                try
-                {
-                    bmp.SetPixel(x, z, Color.White);
-                }
-                catch
-                {
-                    Console.WriteLine($"Naughty pixel is (x: {x}, z: {z})");
-                    Environment.Exit(1);
-                }
+                bmp.SetPixel(x, z, Color.White);
             }
 
             bmp.Save("results/galaxy.png");
