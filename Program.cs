@@ -113,6 +113,9 @@ namespace Galaxy_Generator
         {
             elliptical,
         }
+
+        public Galaxy() { StarSystems = []; }
+
         public Galaxy(Sizes? galaxySize, GalaxyTypes? galaxyType)
         {
             Random random = new();
@@ -184,6 +187,31 @@ namespace Galaxy_Generator
             }
 
             bmp.Save("results/galaxy.png");
+        }
+
+        public static implicit operator Galaxy(KnockoffGalaxy knockoffGalaxy)
+        {
+            Dictionary<(double, double, double), StarSystem> goodStarSystems = [];
+            foreach (KeyValuePair<string, StarSystem> kvp in knockoffGalaxy.StarSystems)
+            {
+                string[] systemsParts = kvp.Key.Trim('(', ')', ' ').Split(", ");
+
+                goodStarSystems.Add((
+                    double.Parse(systemsParts[0]),
+                    double.Parse(systemsParts[1]),
+                    double.Parse(systemsParts[2])
+                ), kvp.Value);
+            }
+
+            double[] coordParts = [.. knockoffGalaxy.GalaxySizeCoords.Trim('(', ')', ' ').Split(", ").Select(double.Parse)];
+            
+            return new() {
+                GalaxySize = knockoffGalaxy.GalaxySize,
+                GalaxySizeCoords = ((int)coordParts[0], coordParts[1], (int)coordParts[2]),
+                GalaxyType = knockoffGalaxy.GalaxyType,
+                NumberOfStarSystems = knockoffGalaxy.NumberOfStarSystems,
+                StarSystems = goodStarSystems
+            };
         }
     }
 
@@ -277,12 +305,35 @@ namespace Galaxy_Generator
         
     }
 
+    public class KnockoffGalaxy
+    {
+        public Dictionary<string, StarSystem> StarSystems { get; set; }
+        public Sizes GalaxySize { get; set; }
+        public Galaxy.GalaxyTypes GalaxyType { get; set; }
+        public string GalaxySizeCoords { get; set; }
+        public int NumberOfStarSystems { get; set; }
+
+        public KnockoffGalaxy() { StarSystems = []; GalaxySizeCoords = ""; }
+
+        public static implicit operator KnockoffGalaxy(Galaxy galaxy)
+        {
+            return new()
+            {
+                StarSystems = galaxy.StarSystems.Keys.ToList().Select(k => k.ToString()).Zip(galaxy.StarSystems.Values).ToDictionary(),
+                GalaxySize = galaxy.GalaxySize,
+                GalaxyType = galaxy.GalaxyType,
+                GalaxySizeCoords = galaxy.GalaxySizeCoords.ToString(),
+                NumberOfStarSystems = galaxy.NumberOfStarSystems
+            };
+        }
+    }
+
     public static class GalaxyFileManagement
     {
-        public static void Save<T>(T obj)
+        public static void Save(KnockoffGalaxy knockoff)
         {
             string file = JsonConvert.SerializeObject(
-                obj,
+                knockoff,
                 Formatting.Indented,
                 new JsonSerializerSettings
                 {
@@ -292,15 +343,15 @@ namespace Galaxy_Generator
             File.WriteAllText("results/galaxy.json", file);
         }
 
-        public static Galaxy? Load(string json)
+        public static Galaxy Load(string json)
         {
-            return JsonConvert.DeserializeObject<Galaxy>(
+            return JsonConvert.DeserializeObject<KnockoffGalaxy>(
                 json,
                 new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto
                 }
-            );
+            )!;
         }
     }
 
