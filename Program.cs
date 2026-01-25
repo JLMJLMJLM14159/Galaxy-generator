@@ -72,9 +72,9 @@ namespace Galaxy_Generator
         {
             Console.Write("Enter x coord for system: ");
             double x = double.Parse(Console.ReadLine()!);
-            Console.Write("\nEnter y coord for system: ");
+            Console.Write("Enter y coord for system: ");
             double y = double.Parse(Console.ReadLine()!);
-            Console.Write("\nEnter z coord for system: ");
+            Console.Write("Enter z coord for system: ");
             double z = double.Parse(Console.ReadLine()!);
 
             return (x, y, z);
@@ -88,13 +88,13 @@ namespace Galaxy_Generator
                 Console.WriteLine($"    Central bodies:");
                 foreach (CentralBody centralBody in value.CentralBodies)
                 {
-                    Console.WriteLine($"        A {centralBody.BodyType}, {centralBody.Size}, with planets:");
+                    Console.WriteLine($"        A {centralBody.Size} {centralBody.BodyType} with planets:");
                     foreach (Planet planet in centralBody.Planets)
                     {
-                        Console.WriteLine($"            A planet, {planet.Size}, with moons:");
+                        Console.WriteLine($"            A {planet.Size} planet with moons:");
                         foreach (Moon moon in planet.Moons)
                         {
-                            Console.WriteLine($"                A moon, {moon.Size}.");
+                            Console.WriteLine($"                A {moon.Size} moon.");
                         }
                     }
                 }
