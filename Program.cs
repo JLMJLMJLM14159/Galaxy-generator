@@ -12,6 +12,7 @@ namespace Galaxy_Generator
         public static readonly Dictionary<string, Action> AdditionalModes = new()
         {
             { "normal", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); } },
+            { "debug", () => { Galaxy galaxy = Create(); galaxy.PrintDebugInfo(); MapAndSaveMap(galaxy); Save(galaxy); } },
             { "normalandviewsystems", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); ViewSystem(galaxy, AskForSystemToView()); } },
             { "loadandviewsystems", () => { Galaxy galaxy = Load()!; ViewSystem(galaxy, AskForSystemToView()); } }
         };
@@ -168,14 +169,6 @@ namespace Galaxy_Generator
             Bitmap bmp = new(GalaxySizeCoords.Item1 + 1, GalaxySizeCoords.Item3 + 1);
             Graphics g = Graphics.FromImage(bmp);
 
-            Console.WriteLine($"X range: {StarSystems.Keys.Min(k => k.Item1)} to {StarSystems.Keys.Max(k => k.Item1)}");
-            Console.WriteLine($"Z range: {StarSystems.Keys.Min(k => k.Item3)} to {StarSystems.Keys.Max(k => k.Item3)}");
-
-            Console.WriteLine($"Average X: {StarSystems.Keys.Average(k => k.Item1)}");
-            Console.WriteLine($"Average Z: {StarSystems.Keys.Average(k => k.Item3)}");
-
-            Console.WriteLine($"GalaxySizeCoords: X={GalaxySizeCoords.Item1}, Y={GalaxySizeCoords.Item2}, Z={GalaxySizeCoords.Item3}");
-
             g.Clear(Color.Black);
 
             foreach (KeyValuePair<(double, double, double), StarSystem> Kvp in StarSystems)
@@ -187,6 +180,17 @@ namespace Galaxy_Generator
             }
 
             bmp.Save("results/galaxy.png");
+        }
+
+        public void PrintDebugInfo()
+        {
+            Console.WriteLine($"X range: {StarSystems.Keys.Min(k => k.Item1)} to {StarSystems.Keys.Max(k => k.Item1)}");
+            Console.WriteLine($"Z range: {StarSystems.Keys.Min(k => k.Item3)} to {StarSystems.Keys.Max(k => k.Item3)}");
+
+            Console.WriteLine($"Average X: {StarSystems.Keys.Average(k => k.Item1)}");
+            Console.WriteLine($"Average Z: {StarSystems.Keys.Average(k => k.Item3)}");
+
+            Console.WriteLine($"GalaxySizeCoords: X={GalaxySizeCoords.Item1}, Y={GalaxySizeCoords.Item2}, Z={GalaxySizeCoords.Item3}");
         }
 
         public static implicit operator Galaxy(KnockoffGalaxy knockoffGalaxy)
