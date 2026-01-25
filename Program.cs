@@ -36,6 +36,8 @@ namespace Galaxy_Generator
 
         private static Galaxy Create()
         {
+            Random random = new();
+
             Sizes? galaxySize;
             Console.Write("Enter galaxy size: ");
             string? galaxySizeString = Console.ReadLine();
@@ -44,9 +46,9 @@ namespace Galaxy_Generator
                 try
                 { galaxySize = Enum.Parse<Sizes>(galaxySizeString); }
                 catch
-                { galaxySize = null; }
+                { galaxySize = Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)]; }
             }
-            else { galaxySize = null; }
+            else { galaxySize = Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)]; }
 
             Galaxy.GalaxyTypes? galaxyType;
             Console.Write("Enter galaxy type: ");
@@ -56,9 +58,9 @@ namespace Galaxy_Generator
                 try
                 { galaxyType = Enum.Parse<Galaxy.GalaxyTypes>(galaxyTypeString); }
                 catch
-                { galaxyType = null; }
+                { galaxyType = Enum.GetValues<Galaxy.GalaxyTypes>()[random.Next(Enum.GetValues<Galaxy.GalaxyTypes>().Length)]; }
             }
-            else { galaxyType = null; }
+            else { galaxyType = Enum.GetValues<Galaxy.GalaxyTypes>()[random.Next(Enum.GetValues<Galaxy.GalaxyTypes>().Length)]; }
 
             return new(galaxySize, galaxyType);
         }
