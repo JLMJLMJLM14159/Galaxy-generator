@@ -90,10 +90,10 @@ namespace Galaxy_Generator
                 Console.WriteLine($"    Central bodies:");
                 foreach (CentralBody centralBody in value.CentralBodies)
                 {
-                    Console.WriteLine($"        A {centralBody.Size} {centralBody.BodyType} with planets:");
+                    Console.WriteLine($"        A {centralBody.Size} {centralBody.BodyType} with:");
                     foreach (Planet planet in centralBody.Planets)
                     {
-                        Console.WriteLine($"            A {planet.Size}, {planet.Temperature}, {planet.Habitability} planet with moons:");
+                        Console.WriteLine($"            A {planet.Size}, {planet.Temperature}, {planet.Habitability} planet with:");
                         foreach (Moon moon in planet.Moons)
                         {
                             Console.WriteLine($"                A {moon.Size} moon.");
@@ -274,7 +274,7 @@ namespace Galaxy_Generator
                     
                     foreach (Planet planet in centralBody.Planets)
                     {
-                        int numberOfMoons = random.Next(26);
+                        int numberOfMoons = random.Next(13);
                         for (int i = 1; i <= numberOfMoons; i++)
                         { planet.Moons.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)])); }
                     }
