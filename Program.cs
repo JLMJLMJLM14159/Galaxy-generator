@@ -6,7 +6,6 @@ using static Galaxy_Generator.CentralBody;
 using static Galaxy_Generator.CentralBody.CentralBodies;
 using static Galaxy_Generator.Planet;
 using static Galaxy_Generator.Planet.Habitabilities;
-using static Galaxy_Generator.Planet.Temperatures;
 
 namespace Galaxy_Generator
 {
