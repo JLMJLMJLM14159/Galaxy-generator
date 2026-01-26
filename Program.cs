@@ -25,10 +25,7 @@ namespace Galaxy_Generator
             string? modeString = Console.ReadLine();
             if (modeString != null)
             {
-                if (AdditionalModes.TryGetValue(modeString, out Action? value))
-                {
-                    value();
-                }
+                if (AdditionalModes.TryGetValue(modeString, out Action? value)) { value(); }
                 else { AdditionalModes["normal"](); }
             }
             else { AdditionalModes["normal"](); }
