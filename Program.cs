@@ -271,7 +271,7 @@ namespace Galaxy_Generator
                     }
 
                     for (int i = 1; i <= numberOfPotentialPlanets[chosenIndex]; i++)
-                    { centralBody.Planets.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)], Enum.GetValues<Temperatures>()[random.Next(Enum.GetValues<Temperatures>().Length)], random.NextDouble() <= 95 ? sterile : fertile)); }
+                    { centralBody.Planets.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)], Enum.GetValues<Temperatures>()[random.Next(Enum.GetValues<Temperatures>().Length)], random.NextDouble() <= 75 ? sterile : fertile)); }
                     
                     foreach (Planet planet in centralBody.Planets)
                     {
