@@ -4,6 +4,9 @@ using static Galaxy_Generator.SizesClass;
 using static Galaxy_Generator.SizesClass.Sizes;
 using static Galaxy_Generator.CentralBody;
 using static Galaxy_Generator.CentralBody.CentralBodies;
+using static Galaxy_Generator.Planet;
+using static Galaxy_Generator.Planet.Habitabilities;
+using static Galaxy_Generator.Planet.Temperatures;
 
 namespace Galaxy_Generator
 {
@@ -268,7 +271,7 @@ namespace Galaxy_Generator
                     }
 
                     for (int i = 1; i <= numberOfPotentialPlanets[chosenIndex]; i++)
-                    { centralBody.Planets.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)])); }
+                    { centralBody.Planets.Add(new(Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)], Enum.GetValues<Temperatures>()[random.Next(Enum.GetValues<Temperatures>().Length)], random.NextDouble() <= 95 ? sterile : fertile)); }
                     
                     foreach (Planet planet in centralBody.Planets)
                     {
@@ -281,26 +284,40 @@ namespace Galaxy_Generator
         }
     }
 
-    public abstract class StellarBody(Sizes size = normal)
+    public abstract class StellarBody(Sizes size = Sizes.normal)
     {
         public Sizes Size { get; set; } = size;
     }
 
-    public class CentralBody(Sizes size, CentralBodies bodyType)
+    public class CentralBody(Sizes size, CentralBodies bodyType) : StellarBody(size)
     {
         public List<Planet> Planets { get; set; } = [];
-        public Sizes Size { get; set; } = size;
+        public CentralBodies BodyType = bodyType;
         public enum CentralBodies
         {
             star,
             blackhole
         }
-        public CentralBodies BodyType = bodyType;
     }
 
-    public class Planet(Sizes size) : StellarBody(size)
+    public class Planet(Sizes size, Temperatures temperature, Habitabilities habitability) : StellarBody(size)
     {
         public List<Moon> Moons { get; set; } = [];
+        public enum Temperatures
+        {
+            arid,
+            warm,
+            normal,
+            cold,
+            freezing
+        }
+        public enum Habitabilities
+        {
+            fertile,
+            sterile
+        }
+        public Temperatures Temperature = temperature;
+        public Habitabilities Habitability = habitability;
     }
 
     public class Moon(Sizes size) : StellarBody(size)
