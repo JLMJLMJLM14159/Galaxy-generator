@@ -124,10 +124,11 @@ namespace Galaxy_Generator
             GalaxySize = galaxySize != null ? galaxySize.Value : Enum.GetValues<Sizes>()[random.Next(Enum.GetValues<Sizes>().Length)];
             GalaxyType = galaxyType != null ? galaxyType.Value : Enum.GetValues<GalaxyTypes>()[random.Next(Enum.GetValues<GalaxyTypes>().Length)];
             StarSystems = [];
-            StarSystems.Add((0, 0, 0), new(true));
 
             GalaxySizeCoords = (10 * (int)GalaxySize, 0.019 * (int)GalaxySize, 10 * (int)GalaxySize);
             NumberOfStarSystems = 2000 * (int)GalaxySize;
+
+            StarSystems.Add((GalaxySizeCoords.Item1 / 2, GalaxySizeCoords.Item2 / 2, GalaxySizeCoords.Item3 / 2), new(true));
 
             Bitmap bitmap = new($"{AppContext.BaseDirectory}/Probability textures/{GalaxyType}.png");
 
