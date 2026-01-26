@@ -93,7 +93,7 @@ namespace Galaxy_Generator
                     Console.WriteLine($"        A {centralBody.Size} {centralBody.BodyType} with planets:");
                     foreach (Planet planet in centralBody.Planets)
                     {
-                        Console.WriteLine($"            A {planet.Size} planet with moons:");
+                        Console.WriteLine($"            A {planet.Size}, {planet.Temperature}, {planet.Habitability} planet with moons:");
                         foreach (Moon moon in planet.Moons)
                         {
                             Console.WriteLine($"                A {moon.Size} moon.");
