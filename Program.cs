@@ -101,6 +101,8 @@ namespace Galaxy_Generator
                     }
                 }
             }
+            else
+            { Console.WriteLine("Galaxy does not exist."); }
         }
     }
 
