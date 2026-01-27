@@ -1,3 +1,6 @@
 bin/
 obj/
 results/
+vs/
+
+upgradelog.htm

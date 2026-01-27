@@ -146,7 +146,12 @@ namespace Galaxy_Generator
                     StarSystems.Add((x, y, z), new(false));
                     numberOfStarSystemsToMake--;
 
-                    Console.WriteLine($"({x}, {y}, {z}), {NumberOfStarSystems - numberOfStarSystemsToMake}/{NumberOfStarSystems}, {(decimal)(NumberOfStarSystems - numberOfStarSystemsToMake) / NumberOfStarSystems * 100}%");
+                    Console.Write($"({x}, {y}, {z})");
+                    Console.Write(", ");
+                    Console.Write($"{NumberOfStarSystems - numberOfStarSystemsToMake}/{NumberOfStarSystems}");
+                    Console.Write(", ");
+                    Console.Write($"{(decimal)(NumberOfStarSystems - numberOfStarSystemsToMake) / NumberOfStarSystems * 100}%");
+                    Console.Write("\n");
                 }
             }
         }
