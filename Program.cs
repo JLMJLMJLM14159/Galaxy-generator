@@ -15,8 +15,8 @@ namespace Galaxy_Generator
         {
             { "normal", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); } },
             { "debug", () => { Galaxy galaxy = Create(); galaxy.PrintDebugInfo(); MapAndSaveMap(galaxy); Save(galaxy); } },
-            { "normalandviewsystems", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); ViewSystem(galaxy, AskForSystemToView()); } },
-            { "loadandviewsystems", () => { Galaxy galaxy = Load()!; ViewSystem(galaxy, AskForSystemToView()); } }
+            { "normalandviewsystem", () => { Galaxy galaxy = Create(); MapAndSaveMap(galaxy); Save(galaxy); ViewSystem(galaxy, AskForSystemToView()); } },
+            { "loadandviewsystem", () => { Galaxy galaxy = Load()!; ViewSystem(galaxy, AskForSystemToView()); } }
         };
 
         public static void Main()
